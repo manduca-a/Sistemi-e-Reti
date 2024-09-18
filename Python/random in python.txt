@@ -1,0 +1,6 @@
+random.random() genera un float tra 0 e 1
+
+random.randint(a, b) o anche randrange (a, b+1) genera un intero tra a e b comprese
+
+random.choice(array) sceglie un elemento dell'array
+
