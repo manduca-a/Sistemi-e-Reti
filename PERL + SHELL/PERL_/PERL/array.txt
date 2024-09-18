@@ -1,0 +1,14 @@
+push @nomearray, elementi     -->    aggiunge in coda
+
+pop @nomearray   -->    prende l'ultimo 
+
+
+shift @nomearray   -->   prende il primo
+
+unshift @nomearray, elementi     -->    aggiunge in testa
+
+
+
+@numeri_tombola = (1..90);			numeri da 1 a 90
+
+@alfabeto_minuscolo = (a..z)

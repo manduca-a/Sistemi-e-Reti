@@ -1,0 +1,166 @@
+NOME
+       taskset - imposta o recupera l'affinità della CPU di un processo
+
+
+
+	per trovare il numero di core dal file /proc/stat -> cat /proc/stat | grep -e "cpu[[:digit:]]" | wc -l
+
+SINOSSI
+       taskset [opzioni] maschera comando [ argomento ...] taskset [opzioni] -p [ maschera ] pid
+
+       
+DESCRIZIONE
+
+		SOSTANZIALMENTE SERVE PER POTER DIRE AD UN PROGRAMMA DI SFRUTTARE UN TOT DI CORE DEL PROCESSORE SUL PC			
+			(ESEMPIO SI VORREBBE USARE vlcPLAYER SU PRIMO E ULTIMO CORE DI UN SISTEMA EXACORE -> 
+					prima si recuper il pid oppure si può direttamente lanciare vlc  -> 
+							poi taskset -cp 0,5 [pid di vlc])
+
+       Il comando taskset viene utilizzato per impostare o recuperare l'affinità della CPU 
+       di un processo in esecuzione dato il suo pid o per lanciare un nuovo comando 
+       con una data affinità della CPU. L'affinità della CPU è una proprietà dello scheduler 
+       che "lega" un processo a un determinato insieme di CPU nel sistema. Lo 
+       scheduler di Linux rispetterà l'affinità della CPU data e il processo 
+       non verrà eseguito su altre CPU. Si noti che lo scheduler di Linux 
+       supporta anche l'affinità naturale della CPU: lo scheduler tenta di 
+       mantenere i processi sulla stessa CPU il più a lungo possibile per 
+       motivi di prestazioni. Pertanto, forzando una specifica affinità della CPU
+       è utile solo in determinate applicazioni. L'affinità di alcuni 
+       processi come i thread del kernel per CPU non può essere impostata. 
+
+       L'affinità della CPU è rappresentata come una maschera di bit, con il 
+       bit di ordine più basso corrispondente alla prima CPU logica e il 
+       bit di ordine più alto corrispondente all'ultima CPU logica. Non tutte le CPU possono 
+       esistere su un dato sistema, ma una maschera può specificare più CPU di quelle 
+       presenti. Una maschera recuperata rifletterà solo i bit che 
+       corrispondono alle CPU fisicamente sul sistema. Se viene data una maschera non valida 
+       (cioè una che corrisponde a nessuna CPU valida sul 
+       sistema corrente) viene restituito un errore. Le maschere possono essere specificate
+       in esadecimale (con o senza uno "0x" iniziale), o come elenco di CPU 
+       con l' opzione --cpu-list . 
+		
+    Ad esempio, 0x00000001 è il processore n. 0, 
+		0x00000003 sono i processori n. 0 e n. 1, 
+		FFFFFFFF sono i processori da n. 0 a n. 31, 
+		0x32 sono i processori n. 1, n. 4 e n. 5, 
+		--cpu-list 0-2,6 sono i processori #0, #1, #2 e #6. 
+		--cpu-list 0-10:2 sono i processori #0, #2, #4, #6, #8 e #10. 
+	
+		Il suffisso ":N" specifica il passo nell'intervallo, 
+		ad esempio 0-10:3 viene interpretato come lista 0,3,6,9.
+ 
+       Quando taskset restituisce, è garantito che il programma dato è 
+       stato pianificato su una CPU legale.
+
+
+		PER LANCIARE PROGRAMMI CON UNA CERTA CPU SI FA: taskset 0xa gedit  //si lancia il programma gedit sulla cpu 0xa che sarebbe 10 presumo
+
+
+
+
+OPZIONI
+       
+	-a , --all-tasks 
+           Imposta o recupera l'affinità CPU di tutti i task (thread) 
+           per un dato PID. 
+
+	-c , --cpu-list 
+           Interpreta la maschera come un elenco numerico di processori invece di una 
+           maschera di bit. I numeri sono separati da virgole e possono includere 
+           intervalli. Ad esempio: 0,5,8-11 . 
+
+	-p , --pid 
+           Opera su un PID esistente e non avvia una nuova attività. 
+
+	-h , --help 
+           Visualizza il testo della guida ed esce. 
+
+	-V , --version 
+           Stampa la versione ed esce.
+
+  
+       
+UTILIZZO         
+       Il comportamento predefinito è eseguire un nuovo comando con una data 
+       maschera di affinità: taskset mask comando [ argomenti ] 
+       È anche possibile recuperare l'affinità CPU di un'attività esistente: taskset -p pid 
+       Oppure impostarla: taskset -p mask pid 
+       Quando una cpu- list è specificato per un processo esistente, le opzioni -p e
+        -c devono essere raggruppate insieme:
+            taskset -pc cpu-list pid 
+       Il modulo --cpu-list è applicabile solo per lanciare nuovi 
+       comandi: taskset --cpu-list cpu- comando elenco
+           
+
+          
+           
+AUTORIZZAZIONI         
+       Un utente può modificare l'affinità della CPU di un processo appartenente allo 
+       stesso utente. Un utente deve possedere CAP_SYS_NICE per modificare l' 
+       affinità CPU di un processo appartenente a un altro utente. Un utente può 
+       recuperare la maschera di affinità di qualsiasi processo.
+
+VALORE DI RITORNO         
+       taskset restituisce 0 nella sua modalità di acquisizione dell'affinità finché 
+       esiste il PID fornito. taskset restituisce 0 nella sua modalità di impostazione dell'affinità finché lo fa la chiamata di sistema 
+       sottostante sched_setaffinity(2) . Il successo del 
+       comando non garantisce che il thread specificato sia 
+       effettivamente migrato alle CPU indicate, ma solo che il 
+       thread non migrerà a una CPU al di fuori della nuova affinity mask. 
+       Ad esempio, è possibile impostare l'affinità del thread del kernel kswapd, 
+       ma il thread potrebbe non migrare immediatamente e non è garantito 
+       che lo faccia mai: 
+
+
+       
+	$ ps ax -o comm,psr,pid | grep kswapd
+
+              kswapd0 4 82 
+       
+	$ sudo taskset -p 1 82 
+              maschera di affinità attuale di pid 82: 1 
+              nuova maschera di affinità di pid 82: 1 
+       
+	$ echo $? 
+	      0 
+       
+	$ ps ax -o comm,psr,pid | grep kswapd 
+       	      kswapd0 4 82 
+       
+	$ taskset -p 82 
+       	      pid 82's current affinity mask: 1 
+
+       Al contrario, quando l'utente specifica un'affinità illegale, taskset 
+       stamperà un errore e restituirà 1: 
+
+       
+	$ ps ax -o comm,psr,pid | grep ksoftirqd/0
+		ksoftirqd/0 0 14 
+       
+	$ sudo taskset -p 1 14 
+       		pid 14's current affinity mask: 1
+       		taskset: impossibile impostare l'affinità del pid 14: argomento non valido 
+       
+	$ echo $? 
+       		1
+
+
+
+DISPONIBILITA'         
+       Il comando taskset fa parte del pacchetto util-linux che può 
+       essere scaricato da Linux Kernel Archive 
+       < https://www.kernel.org/pub/linux/utils/util-linux/ >. Questa pagina 
+       fa parte del progetto util-linux (una raccolta casuale di 
+       utilità Linux). Informazioni sul progetto sono disponibili su 
+       ⟨ https://www.kernel.org/pub/linux/utils/util-linux/ ⟩. Se hai 
+       una segnalazione di bug per questa pagina di manuale, inviala a 
+       util-linux@vger.kernel.org. Questa pagina è stata ottenuta da  
+       repository Git upstream del progetto
+       ⟨git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git⟩ su 
+       23-06-2023. (A quel tempo, la data del commit più recente 
+       che è stato trovato nel repository era 2023-06-22.) Se scopri 
+       problemi di rendering in questa versione HTML della pagina, o ritieni che 
+       ci sia una versione migliore o più in alto -fonte aggiornato per la pagina, 
+       o hai correzioni o miglioramenti alle informazioni in 
+       questo COLOPHON (che non fa parte della pagina di manuale originale), 
+       invia una mail a man-pages@man7.org util-linux 2.39.268 -ae62d 2023-06-22 COMPITO(1)

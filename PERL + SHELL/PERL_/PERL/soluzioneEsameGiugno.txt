@@ -1,0 +1,4 @@
+
+PID del processo che usa la CPU per più tempo
+
+ps -A --sort=time -o pid | tail -n 1

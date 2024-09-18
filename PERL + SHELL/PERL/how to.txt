@@ -1,0 +1,80 @@
+APRIRE BASH  -->  Ctrl + Alt + F1/F7
+
+CHIUDERE BASH  -->  Ctrl + D / exit
+
+RICERCA CRONOLOGIA TERMINALE  -->  Ctrl + R
+
+
+
+	comando > nomefile.txt  -->  scrive l'output del comando nel file specificato
+
+	comando >> nomefile.txt  -->  appende l'output del comando nel file specificato
+
+	comando < nomefile.txt  -->  prende l'input dal file specificato
+
+
+
+cd <nomecartella>  -->  si va nella cartella specificata, se null va a /home
+
+ls  -->  simile a dir ma con diverse funzionalità
+
+mkdir <nomecartella>  -->  crea una cartella  //aggiungendo -p crea sottocartelle non esistenti
+
+						//aggiungendo altri percorsi si possono creare più cartelle
+
+rmdir <nomecartella>  -->  elimina una cartella
+
+pwd  -->  mostra il percorso attuale
+
+
+	cp nomefile1 nomefile2  -->  crea una copia di file1 chiamata file2
+
+	mv nomefile1 nomefile2  -->  rinomina file1 in file2, anche per le estensioni
+
+	rm nomefile  -->  elimina il file specificato
+
+	less nomefile  -->  apre il file
+
+	cat nomefile  -->  mostra il contenuto del file nel terminale
+
+	file nomefile  -->  mostra l'estensione
+
+	touch nomefile  -->  se non esiste crea un file vuoto chiamato come specificato, altrimenti ne modifica 						solamente la data di modifica
+
+	find nomecartella -name nomefile  -->  cerca il file specificato nella cartella specificata
+
+	find nomecartella -name *.estensione  -->  cerca i file con estensione specificata nella cartella specificata
+
+	grep parola nomecartella(oppure nomefile)  -->  cerca nei file contenuti nella cartella specificata(oppure nel file specificato), la parola specificata
+
+
+	per permettere la corretta esecuzione di un file, all'inizio di esso va messo -> #! cartellaInterprete
+
+
+
+[A?B]*  -->  tutti i file che iniziano per AqualcosaB...
+
+
+
+env  -->  mostra le variabili d'ambiente
+								(Variabili speciali: $SHELL, $PATH, $HOME)
+export  --> modifica una di esse
+
+ps  -->  lista procassi attivi
+
+top(oppure htop)  -->  task manager
+
+kill pid  -->  termina il processo con il pid specificato
+
+jobs  -->  tasks eseguiti in background
+
+fg  -->  passa un task da back a foreground
+
+bg  --> riprende a eseguire un task lasciato in background
+
+chmod  -->  garantire permessi di accesso a file
+
+
+pico nomefile  -->  apre un editor di testo e salva con nomefile
+
+vi  -->  è invece l'editor presente su qualsiasi genere di macchina

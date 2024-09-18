@@ -1,0 +1,112 @@
+Un carattere backslash () seguito da un carattere non alfanumerico corrisponde esattamente a quel carattere; in particolare, \ corrisponde a .
+
+Altri caratteri speciali sono quelli che delimitano l'espressione con l'inizio e la fine del testo
+
+Carattere	Descrizione
+^	(solo all'inizio dell'espressione) fa in modo che il testo corrisponda al pattern solo se il pattern è all'inizio del testo
+$	(solo alla fine dell'espressione) fa in modo che il testo corrisponda al pattern solo se il pattern è alla fine del testo
+Qualche esempio chiarirà un po' le cose:
+
+Espressione	Risultato
+"bla" =~ ///	falso, poichè cerca in "bla" il carattere /
+"blh" =~ /$/	falso, poichè cerca in "bla" il carattere £
+Quindi per cercare un carattere speciale (o, se volete, riservato) bisogna chiarire tramite il simbolo che si ricerca proprio quel carattere, e non il suo valore. E la stessa cosa per la ricerca con grep ma anche con editor (vi, ad esempio)
+
+Ecco qualche altro esempio:
+
+Espressione	Risultato
+"bla" =~ /la/	vero
+"bla" =~ /^la/	falso
+"bla" =~ /^bl/	vero
+"bla" =~ /a$/	vero
+"bla" =~ /ls$/	falso
+bla" =~ /^bla$/	vero
+Altri caratteri speciali sono:
+
+Carattere	Descrizione
+.	cerca ogni singolo carattere
+t	cerca una tabulazione
+s	cerca uno spazio o una tabulazione
+S	cerca ogni carattere che non sia una tabulazione
+n	cerca una "newline"
+w	cerca ogni singola lettera, cifra ma anche _
+W	cerca ogni cosa che non sia una lettera, una cifra o _
+d	cerca ogni singola cifra da 0 a 9
+D	cerca ogni carattere che non sia una cifra
+Ecco alcuni modi per applicarli:
+
+Espressione	Risultato
+"bla" =~ /b.a/	vero
+"bla" =~ /b.la/	falso
+"bla" =~ /bw.a$/	vero
+"bla" =~ /wD/	vero
+"bla" =~ /d/	falso
+Campi di ricerca e parentesi quadre
+Se inseriamo tra parentesi quadre alcuni caratteri, indichiamo che ciascuno di quei caratteri può essere riconosciuto dall'espressione:
+
+[caratteri] -- cerca ogni carattere che sia tra [ ]
+Inoltre, un campo di ricerca può essere specificato con - , ad esempio [a-m] riconosce le lettere tra la a e la m.
+
+Se il primo carattere tra parentesi quadre è ^, il significato è rovesciato (negato), e verrà cercato tutto ciò che NON è quello che è compreso tra [ ]
+
+Espressione	Risultato
+[-.0.9]	cerca esattamente un - un . o una cifra
+[^@ t]	cerca qualsiasi carattere che non sia un @, una tabulazione o uno spazio. Da notare che il ^ davanti a @ è opzionale, poichè il simbolo @ non ha particolari significati in questo contesto; ma funziona anche con @
+
+Quantificatori
+I quantificatori determinano il numero minimo e massimo di volte che un determinato elemento deve ricorrere consecutivamente:
+
+Quantificatore	Descrizione
+( )	raggruppa più elementi in un pattern da cercare una volta
+*	Corrisponde all'intervallo {0, } ovvero da un minimo di 0 volte ad un massimo indefinito
++	Corrisponde all'intervallo {1, }
+?	Corrisponde all'intervallo {0, 1}
+s	Opera una sostituzione
+tr	Opera una traduzione nella forma 'tr [a-z] [A-Z]' (ovvero rende maiuscoli i caratteri minuscoli e viceversa)
+Ecco gli esempi:
+
+Espressione	Risultato
+"bla" =~ /c*k*z?b+.a/	vero, visto che la c, la k e la z non ci sono, la b appare una volta e la a anche
+"ccckkzbbb8lZOINX" =~ /c*k*z?b+.l/	vero
+"blabla" =~ /ah(EEK)?bl/	falso
+"blaEEKbla" =~ /a(EEK)?bl/	vero
+"blaEEKEEKbla" =~ /a(EEK)?bl/	falso
+"blaEEKEEKbla" =~ /a(EEK)+bl/	vero
+Guardiamo questa espressione:
+
+/^([^@ t]+@[^@ t])+s+([-.0-9]+)$/
+Corrisponde ad una riga che inizia con un numero maggiore di 0 di caratteri che non sono né @ né spazi né tabulazioni, poi una @, poi altri caratteri che non sono @ né spazi né tabulazioni, poi alcuni spazi e tabulazioni, poi qualsiasi mistura di '-', '.' e cifra. In parole povere, qualcosa di simile ad un indirizzo e-mail seguito da spazi e qualcosa che si può ragionevolmente pensare come un numero! In parole ancora più povere, una volta capito come funzionano le espressioni regolari, è più facile scriverle che spiegarle.
+
+/^s*(d+).(d+).(d+).(d+)s*$/
+Questo invece potrebbe corrispondere ad un indirizzo IP.
+
+Sub-pattern e sostituzioni
+Se il pattern ha dei sub-pattern, compresi tra parentesi tonde (), questi sono assegnati a variabili numerate, $1 per la prima, $2 per la seconda etc.
+
+Riprendendo l'esempio dell'indirizzo IP abbiamo che:
+
+"129.199.129.13" =~ /^s*(d+).(d+).(d+).(d+)s*$/;
+
+$1 è 129, $2 è 199, $3 è 129, $4 è 13
+Un pattern con sostituzione è scritto nella forma:
+
+$variabile =~ s/pattern/replacement/;
+Il pattern è sempre un'espressione regolare, ed il replacement è una normale stringa, tranne per il fatto che possiamo inserire al suo interno le variabili.
+
+Nella maggior parte dei casi, si può aggiungere il carattere 'g' dopo il replacement, in modo che le parole che corrispondono al pattern siano tutte cambiate, non solo la prima.
+
+$waitops{$c} =~ s/:${oldnick}:/:${newnick}:/g
+
+La funzione split
+Le espressioni regolari lavorano con la funzione split di perl, che prende come argomento un'espressione regolare , una variabile scalare e, volendo, un secondo scalare che specifica il numero massimo di campi in cui splittare il pattern.
+
+@array = split(/pattern/, expression);
+Nel caso più tipico, si può voler splittare una linea in parole, come segue:
+
+@words = split(/s+/, $some_line);  
+# se $some_line era "a b c", ora @words è ("a", "b", "c")
+oppure
+
+($val1, $val2) = split(/s+/, $whatever);
+# assenga a $val1 il primo valore di $whatever e a $val2 il secondo
+# Eventuali altri valori (terzo, quarto ecc.) vengono scartati

@@ -1,0 +1,7 @@
+mkdir a
+
+mkdir a/c a/b/e a/b/f			//crea cartella e dentro b dentro a, se non esiste b la crea
+
+touch a/file1.txt a/file2.txt a/file3.txt a/xfile.txt a/doc1.doc
+
+mv a/file3.txt a/file3.tmt

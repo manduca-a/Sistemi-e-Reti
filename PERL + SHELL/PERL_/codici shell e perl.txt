@@ -1,0 +1,46 @@
+1.	Scrivere una linea di comando che esamini il contenuto del file /proc/cpuinfo e restituisca il numero di CPU presenti nel calcolatore;
+
+		cat /proc/cpuinfo | grep processor | tail -n 1
+
+
+2.	Scrivere una linea di comando che mostri i primi 5 processi che utilizzano più memoria RAM;
+
+		ps -e --sort=-%mem | head -n 6
+
+
+3.	Scrivere una linea di comando che elenchi i soli file di una certa cartella la cui dimensione è nell’ordine dei Gigabyte (consultare la documentazione di ls oppure usare il comando find);
+
+		find /path/della/cartella -type f -size +1G
+
+
+
+4.	Scrivere una linea di comando che elenchi le risorse presenti in una certa cartella mostrandone esclusivamente il nome e la dimensione (usare perl oppure cut + column);
+
+		ls /usr -lh | awk '{print $9, $5}'
+
+
+5.	Scrivere una linea di comando che calcoli la somma delle dimensioni di tutti i file di una certa cartella;
+
+		find /path/della/cartella -type f -exec stat -c "%s" {} + | awk '{total += $1} END {print total}'
+
+
+6.	Scrivere una linea di comando che elenchi tutti i file con estensione ".log" più vecchi di 30 giorni in una certa cartella (si può usare /var/log per le prove)
+
+		find /path/della/cartella -name "*.log" -type f -mtime +30
+
+
+8.	Scrivere una linea di comando che trovi tutti i file con estensione ".txt" in una cartella e nelle sue sottocartelle e li copi in una cartella chiamata "backup";
+
+		mkdir backup | find /home -name "*.txt" -type f -exec cp {} /backup \;
+
+
+
+9.	Scrivere una linea di comando che visualizzi il contenuto del file /proc/uptime e converta i secondi di uptime in minuti e secondi;
+
+		awk '{printf("Uptime: %d min %d sec\n", $1/60, $1%60)}' /proc/uptime
+
+
+
+11.	Scrivi una linea di comando che utilizzi l’output del comando ‘file’ per determinare il tipo di file più frequente nella cartella /usr/bin (ingredienti: file; perl; sort; uniq; tail);
+
+find /usr/bin -type f -exec file -b {} \; | cut -d ',' -f 1 | sort | uniq -c | sort -rn | head -n 1

@@ -1,0 +1,108 @@
+.
+(il punto) esegue la concatenazione
+
+eq
+controlla che le stringhe siano uguali
+
+ne
+è l'opposto di eq
+
+3 == 3
+è vero
+
+3 == "03"
+è vero
+
+"bla" eq "arr"
+è falso
+
+"bla" ne "arr"
+è vero
+
+"bla".3
+è equivalente a "bla"."3", che restituisce "bla3"
+
+"bla eek!"
+è lo stesso di $bla."eek!"
+
+Ci sono poi gli operatori logici: && (AND), || (OR), ! (NOT). && e || vanno tra due espressioni, mentre ! va all'inizio dell'espressione (poichè la nega)
+
+3 == "03" && "bla"ne "arr"
+è vera
+
+Questa espressione funziona perchè == e ne hanno una precedenza più alta rispetto a &&, ma la stessa espressione avrebbe potuto essere scritta più chiaramente come:
+
+(3 == 03) && ("bla" ne "arr")
+
+!("eek" eq $bla)
+è lo stesso di ("eek" ne $bla)
+
+Una particolarità degli operatori && e || è che possono essere utilizzati come scorciatoie per "se è verificata la condizione fai questo".
+
+unlink "dumbfile" || die "Couldn't remove filen";
+
+In questo modo prima viene valutato unlink() e, se questo ha successo, la condizione introdotta da || viene ignorata, altrimenti (in caso di insuccesso) tale condizione viene eseguita.
+L'operatore =~ è particolare: questo guarda che 2 pattern siano uguali e li sostituisce. La sintassi è:
+
+valore =~ /pattern/;
+Controlla se le variabili sono uguali
+
+valore !~ /pattern/
+Forma corta per !($variabile=~/pattern/;). Controlla che non siano uguali
+
+$variabile =~ s/pattern/replacement/;
+Cerca il pattern nella variabile, e la sostituisce con replacement
+
+Se la variabile è omessa, =~ e !~ agiscono su $_
+Nella prima forma, senza la s/ , =~ e !~ non modificano gli argomenti, ma testano solo se combaciano. Nella seconda forma, il pattern "replacement" è sostituito a pattern se questo viene trovato.
+
+Ancora, alcuni modificatori possono essere aggiunti prima del ; per specificare come i pattern devono combaciare:
+
+i - case-insensitive
+g - match globale. Controlla e restituisce anche più di un valore
+
+I pattern sono espressioni regolari abbastanza simili a quelle di grep. Questo verrà spiegato in seguito.
+
+"bla" =~ /bl/;
+vero perchè bla contiene bl
+
+"blabla" =~ /bl/;
+idem
+
+"blabla" =~ /bl/g;
+trova 2 matches
+
+"bla" !~ /c/i;
+vero
+
+$var = "blabla";
+
+$var =~ s/bl/QQ/;
+vero, e cambia $var in "QQahbla"
+
+$var =~ s/BL/qq/ig;
+vero, e $var diventa "qqahqqah"
+
+L'operatore = assegna il secondo elemento al primo. Ci sono delle scorciatoie per utilizzare questo operatore.
+
+$var += $value:
+aggiunge $value a $var
+
+$var -= $value;
+sottrae $value da $var
+
+$var *= $value;
+moltiplica $var per $value
+
+$var /= $value;
+divide $var per $value
+
+Queste espressioni sono invece utilizzate per incrementare il valore delle variabili:
+
+$counter += $step;
+
+$var ++
+aggiunge 1 a $var
+
+++$var
+valuta $var+1s
